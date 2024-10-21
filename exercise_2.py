@@ -154,7 +154,7 @@ def near_ten(num):
     near_ten(17) â†’ False
     near_ten(19) â†’ True
     """
-    return num%10<=2 # Remove this line and add your implementation
+    return abs(num%10)<=2 # Remove this line and add your implementation
 
 
 def count_code(str):
