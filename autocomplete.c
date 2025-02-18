@@ -116,33 +116,23 @@ string substr.
 This function must run in O(log(nterms)) time, where nterms is the number of terms in terms.
 You can assume that terms is sorted in ascending lexicographic order. Hashtag yolo.*/
 {
-    int left = 0;
-    int right = nterms - 1;
-    int mid = left + (right - left)/2; //fixed
-    while (left <= right)
-    {
-        mid = left + (right - left)/2; //fixed
-        char *mid_term = terms[mid].term; // double check
-        char *one_before_mid_term = NULL;
-        if (mid != 0)
-        {
-            one_before_mid_term = terms[mid-1].term;
-        }
-        if (starts_with(mid_term, substr) && !(one_before_mid_term && starts_with(one_before_mid_term, substr))) // if it is the FIRST term that matches
-        {
-            return mid;
-        }
-        if (strcmp(mid_term, substr) < 0) // mid_term comes before substr: your target comes after the midpoint
-        {
-            left = mid + 1; // move the searchbox right
-        }
-        if (strcmp(mid_term, substr) > 0) /* mid_term comes after substr: your target comes before the midpoint.
-        note this includes cases where substr is a substring of mid_term */
-        {
-            right = mid - 1; // move the searchbox left. 
+    int left = 0, right = nterms - 1;
+    int result = -1;  // Store the first found match index
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (starts_with(terms[mid].term, substr)) {
+            result = mid;  // Store potential lowest match
+            right = mid - 1;  // Search left for an earlier match
+        } else if (strcmp(terms[mid].term, substr) < 0) {
+            left = mid + 1;  // Move right
+        } else {
+            right = mid - 1;  // Move left
         }
     }
-    return -1; // target not found
+
+    return result;  // Return first match found or -1 if not found
 }
 
 
@@ -153,30 +143,22 @@ substr.
 This function must run in O(log(nterms)) time, where nterms is the number of terms in terms.
 You can assume that terms is sorted in increasing lexicographic order.*/
 {
-    int left = 0;
-    int right = nterms - 1;
-    int mid = left + (right - left)/2; //fixed
-    while (left <= right)
-    {
-        int mid = left + (right - left)/2; //fixed
-        char *mid_term = terms[mid].term; // double check
-        char *one_before_mid_term = NULL;
-        if (mid != 0)
-        {
-            one_before_mid_term = terms[mid-1].term;
-        }
-        if (starts_with(mid_term, substr) && !(one_before_mid_term && starts_with(one_before_mid_term, substr))) // if it is the FIRST term that matches
-        {
-            return mid;
-        }
-        if (strcmp(mid_term, substr) > 0) 
-        {
-            right = mid - 1; 
-        }
-        if (strcmp(mid_term, substr) < 0) 
-        {
-            left = mid + 1; 
+    
+    int left = 0, right = nterms - 1;
+    int result = -1;  // Store the last found match index
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (starts_with(terms[mid].term, substr)) {
+            result = mid;  // Store potential highest match
+            left = mid + 1;  // Search right for a later match
+        } else if (strcmp(terms[mid].term, substr) < 0) {
+            left = mid + 1;  // Move right
+        } else {
+            right = mid - 1;  // Move left
         }
     }
-    return -1; // target not found
+
+    return result;  // Return last match found or -1 if not found
 }
