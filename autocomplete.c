@@ -11,7 +11,7 @@ int get_number(char *line){
 
 
 
-const char* get_name(const char *line){
+char* get_name(const char *line){
     while (*line == ' ' || *line == '\t' || (*line >= '0' && *line <= '9')) 
     {
         line++;
@@ -108,13 +108,40 @@ int starts_with(char *string, char * substring)
     return 1;
 }
 
-
-
 int lowest_match(term *terms, int nterms, char *substr)
 /* The function returns the index in terms of the first term in lexicographic ordering that matches the
 string substr.
 This function must run in O(log(nterms)) time, where nterms is the number of terms in terms.
 You can assume that terms is sorted in ascending lexicographic order. Hashtag yolo.*/
+{
+    int left = 0;
+    int right = nterms - 1;
+    int mid = (left + right)/2;
+    while (left <= right)
+    {
+        mid = (left + right)/2;
+        char *mid_term = terms[mid].term; // double check
+        char *one_before_mid_term = NULL;
+        if (mid != 0)
+        {
+            one_before_mid_term = terms[mid-1].term;
+        }
+        if (starts_with(mid_term, substr) && !(one_before_mid_term && starts_with(one_before_mid_term, substr))) // if it is the FIRST term that matches
+        {
+            return mid;
+        } else if (strcmp(mid_term, substr) < 0)
+        { // mid_term comes before substr: your target comes after the midpoint
+            left = mid + 1; // move the searchbox right
+        } else if (strcmp(mid_term, substr) > 0) /* mid_term comes after substr: your target comes before the midpoint.
+        note this should include cases where substr is a substring of mid_term */
+        {
+            right = mid - 1; // move the searchbox left. 
+        }
+    }
+    return -1; // target not found
+}
+
+/* jerry's lowest_match
 {
     int left = 0, right = nterms - 1;
     int result = -1;  // Store the first found match index
@@ -131,12 +158,7 @@ You can assume that terms is sorted in ascending lexicographic order. Hashtag yo
             right = mid - 1;  // Move left
         }
     }
-
-    return result;  // Return first match found or -1 if not found
-}
-
-
-
+*/
 int highest_match(term *terms, int nterms, char *substr)
 /* The function returns the index in terms of the last term in lexicographic order that matches the string
 substr.
