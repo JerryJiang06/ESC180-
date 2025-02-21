@@ -114,35 +114,6 @@ string substr.
 This function must run in O(log(nterms)) time, where nterms is the number of terms in terms.
 You can assume that terms is sorted in ascending lexicographic order. Hashtag yolo.*/
 {
-    int left = 0;
-    int right = nterms - 1;
-    int mid = (left + right)/2;
-    while (left <= right)
-    {
-        mid = (left + right)/2;
-        char *mid_term = terms[mid].term; // double check
-        char *one_before_mid_term = NULL;
-        if (mid != 0)
-        {
-            one_before_mid_term = terms[mid-1].term;
-        }
-        if (starts_with(mid_term, substr) && !(one_before_mid_term && starts_with(one_before_mid_term, substr))) // if it is the FIRST term that matches
-        {
-            return mid;
-        } else if (strcmp(mid_term, substr) < 0)
-        { // mid_term comes before substr: your target comes after the midpoint
-            left = mid + 1; // move the searchbox right
-        } else if (strcmp(mid_term, substr) > 0) /* mid_term comes after substr: your target comes before the midpoint.
-        note this should include cases where substr is a substring of mid_term */
-        {
-            right = mid - 1; // move the searchbox left. 
-        }
-    }
-    return -1; // target not found
-}
-
-/* jerry's lowest_match
-{
     int left = 0, right = nterms - 1;
     int result = -1;  // Store the first found match index
 
@@ -158,14 +129,17 @@ You can assume that terms is sorted in ascending lexicographic order. Hashtag yo
             right = mid - 1;  // Move left
         }
     }
-*/
+    return result;
+}
+
+
+
 int highest_match(term *terms, int nterms, char *substr)
 /* The function returns the index in terms of the last term in lexicographic order that matches the string
 substr.
 This function must run in O(log(nterms)) time, where nterms is the number of terms in terms.
 You can assume that terms is sorted in increasing lexicographic order.*/
 {
-    
     int left = 0, right = nterms - 1;
     int result = -1;  // Store the last found match index
 
@@ -181,6 +155,15 @@ You can assume that terms is sorted in increasing lexicographic order.*/
             right = mid - 1;  // Move left
         }
     }
-
     return result;  // Return last match found or -1 if not found
+}
+
+void autocomplete(term **answer, int *n_answer, term *terms, int nterms, char *substr)
+{
+    int lowest_index = lowest_match(terms, nterms, substr);
+    int highest_index = highest_match(terms, nterms, substr);
+    *n_answer = highest_index - lowest_index + 1;
+    int size = sizeof(*n_answer) / sizeof(term);
+    memmove(*answer, &(terms[lowest_index]), *n_answer*sizeof(term));
+    qsort(*answer, size, sizeof(term), compare_by_weight);
 }
