@@ -158,6 +158,20 @@ You can assume that terms is sorted in increasing lexicographic order.*/
     return result;  // Return last match found or -1 if not found
 }
 
+int compare_by_weight(const void *a, const void *b)
+{
+    double result = ((const term *)a)->weight - ((const term *)b)->weight;
+    if (result < 0)
+    {
+        return -1;
+    }
+    if (result > 0)
+    {
+        return 1;
+    }
+    return 0;
+}
+
 void autocomplete(term **answer, int *n_answer, term *terms, int nterms, char *substr)
 {
     int lowest_index = lowest_match(terms, nterms, substr);
